@@ -5,16 +5,13 @@ from time import time
 import matplotlib.pylab as pl
 
 class Graphics:
-    def __init__(self, file, data, width, height, fps, colors, options):
-        """
-        file, str    : path to sound file
-        data, list   : frequency data
-        width, int   : width of window
-        height, int  : height of window
-        fps, int     : frames per second
-        colors, dict : colors for objects
-        """
+    def __init__(self, file, data, video, video_style, colors):
+        width = video['width']
+        height = video['height']
+        fps = video['fps']
 
+        self.colors = colors
+        self.options = video_style
         self.file = file
         self.width = width
         self.height = height
@@ -23,34 +20,8 @@ class Graphics:
         self.N = len(data)
         self.T = self.N / self.fps
 
-        # default values
-        self.colors = {
-            "graph": (255, 255, 255),
-            "shadow": (0, 0, 255),
-            "window": (0, 0, 0),
-            "fps": (255, 255, 255),
-            "debug": (255, 255, 255)
-            }
-        self.options = {
-            "scene" : "graph",
-            "graph-size": 5,
-            "graph-offset": 20,
-            "shadow-size": 5,
-            "shadow-offset": 15,
-            "shadow-scale": 1,
-            "N-bars" : 50,
-            "bars-crage" : (0, 1)
-            }
-        
-        for key, rgb in colors.items():
-            self.colors[key] = rgb
-
-        for key, val in options.items():
-            self.options[key] = val
-
         if self.options["scene"] == "bar":
-            self.data = self._bins(self.options["N-bars"])
-
+            self.data = self._bins(self.options["n-bars"])
 
     def pygame_events(self):
         for event in pg.event.get():
@@ -58,24 +29,22 @@ class Graphics:
                 pg.quit()
                 sys.exit()
 
-
     def draw_fps(self):
         text = "[" + str(int(self.clock.get_fps())) + "fps]"
         text_obj = self.fps_font.render(text, True, self.colors["fps"])
         self.window.blit(text_obj, (7, 7))
 
-
-    def draw_debug(self, data, n, t):
+    def draw_debug(self, data, n, t, t2):
         texts = \
             f"{n = }",\
             f"{t = :.2f}s of {self.T:.0f}s",\
             f"offset = {t - n / self.fps:.5f}",\
-            f"max = {max(data):.3f}"
+            f"max = {max(data):.3f}",\
+            f"music offset {t2}" 
         dy = 14
         for i, text in enumerate(texts):
             text_obj = self.fps_font.render(text, True, self.colors["debug"])
             self.window.blit(text_obj, (7, 7 + (i+1) * dy))
-
 
     def draw_graph(self, data, color, size=1, y_offset=0, scale=1):
         """
@@ -96,8 +65,7 @@ class Graphics:
             color = color,
             closed = False,
             points = data,
-            width = size)
-        
+            width = size)  
 
     def draw_graph_frame(self, data):
         self.draw_graph(
@@ -112,7 +80,6 @@ class Graphics:
             size = self.options["graph-size"],
             y_offset = self.options["graph-offset"]) 
     
-
     def _bins(self, N):
         """
         Make N bins
@@ -130,33 +97,24 @@ class Graphics:
         m = max([max(y) for y in bins])
         return [b / m for b in bins]
 
-
     def draw_bar_frame(self, data):
         n = len(data)
         c0, c1 = self.options["bars-crange"]
         colors = [(r, g, b) for r, g, b, _ in  # (r, g, b) color range
                   pl.cm.jet(np.linspace(c0, c1, self.height))*255]
         widths = np.linspace(0, self.width, n+1)
-        avg_width = self.width / n 
+        avg_width = self.width / n
 
         for i in range(n):
-            body = pg.Rect(
-                widths[i],                          # x
-                self.height - data[i]*self.height,  # -y
-                avg_width,              # rec width
-                data[i] * self.height)  # rec height
-            pg.draw.rect(
-                self.window,
-                colors[int(data[i]*self.height)-1],
-                body)
-
+            d = data[i] * self.height
+            body = pg.Rect(widths[i], self.height - d, avg_width, d)  # left, top, width, height
+            pg.draw.rect(self.window, colors[int(data[i]*self.height)-1], body)
 
     def draw_main(self, data):
         scenes = {
             "graph": self.draw_graph_frame,
             "bar" : self.draw_bar_frame}
         scenes[self.options["scene"]](data)
-
 
     def start(self):
         # initialize
@@ -175,6 +133,7 @@ class Graphics:
 
         while True:
             # calculate timestep based on real-time
+            dt2 = pg.mixer.music.get_pos() / 1000
             dt = time() - t0
             n = int(self.fps * dt)
 
@@ -188,6 +147,7 @@ class Graphics:
             self.draw_main(data)
             self.draw_fps()
             self.clock.tick(self.fps)
-            self.draw_debug(data, n, dt)
+            self.draw_debug(data, n, dt, dt2)
             pg.display.update()
             self.pygame_events()
+

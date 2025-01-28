@@ -1,0 +1,32 @@
+# Default configuration file
+[processing]
+window = 0.06        # audio slice width in seconds (to apply FFT on)
+scaling = 0.75       # 0 to 1, the lower the number to more downscaling is applied
+smoothing = 2        # width of convolution, 0 for no smoothing
+"n-smooth" = 2         # number of interations to apply smoothing
+"span-hz" = [0, 4000]  # range in Hz
+"time-smoothing" = 2   # number of previous frames to smooth with
+
+[video]
+width = 1200  # window width
+height = 800  # window height
+fps = 60      # video frames per second
+
+[video-style]
+scene = "bar"         # "graph" or "bar" style
+"graph-size" = 5      # line size
+"graph-offset" = 20   # offset y-position 
+"shadow-size" = 0     # use 0 to turn off
+"shadow-offset" = 15  # offset y-position
+"shadow-scale" = 0.7  # downscale the shadow line
+"n-bars" = 100        # number of bars for "bar" style
+"bars-crange"  = [0.0, 0.6]  # color range for bars
+"colors-only" = false        # plot colors only for "bar" style
+
+[colors]
+graph = [0, 255, 0] 
+shadow = [255, 0, 0]
+window = [0, 0, 0]
+fps = [255, 255, 255]
+debug = [255, 255, 255]
+
