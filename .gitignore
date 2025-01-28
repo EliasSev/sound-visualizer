@@ -1,6 +1,6 @@
 # this project
-#*.mp3
-#*.wav
+*.mp3
+*.wav
 *.ipynb
 
 # Byte-compiled / optimized / DLL files
