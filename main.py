@@ -1,8 +1,8 @@
 import toml
 import argparse
 from pathlib import Path
-from src.soundvisualizer import SoundVis
-from src.graphics import Graphics
+from src.soundvis.soundvisualizer import SoundVis
+from src.soundvis.graphics import Graphics
 
 
 def parse_input():

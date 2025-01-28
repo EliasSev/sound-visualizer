@@ -1,8 +1,9 @@
+import sys
 import pygame as pg
 import numpy as np
-import sys
-from time import time
 import matplotlib.pylab as pl
+from time import time
+
 
 class Graphics:
     def __init__(self, file, data, video, video_style, colors):
@@ -150,4 +151,3 @@ class Graphics:
             self.draw_debug(data, n, dt, dt2)
             pg.display.update()
             self.pygame_events()
-
