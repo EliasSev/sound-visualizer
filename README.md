@@ -2,7 +2,7 @@
 Visualize the frequency spectrum of any soundtrack (mp3 or wav) live, and customize the visuals.
 
 ## Usage
-Run `main.py` with the optional flags `--file <sound file>` and `config <toml file>`:
+Run `main.py` with the optional flags `--file <sound file>` and `--config <toml file>`:
 
 ```powershell
 # try example soundfile

@@ -61,6 +61,7 @@ def read_config(toml_path):
         'shadow-scale': 0.7,
         'n-bars': 100,
         'bars-crange': (0.0, 0.6),
+        'color-map': 'viridis',
         'colors-only': False}
     color_default = {
         'graph': (0, 255, 0),

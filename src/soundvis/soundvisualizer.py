@@ -153,7 +153,8 @@ class SoundVis:
             # index of start/stop
             start, stop = self.span[0] * Ni // self.fs, self.span[1] * Ni // self.fs
             f_hats.append(fi_hat[start:stop])
-            progress_bar(i + 1, S)
+            if not (i + 1 % 25) or (i + 1 == S):
+                progress_bar(i + 1, S)
 
         return self._normalize(f_hats)
     

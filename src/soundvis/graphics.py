@@ -1,7 +1,7 @@
 import sys
 import pygame as pg
 import numpy as np
-import matplotlib.pylab as pl
+import matplotlib.pyplot as plt
 from time import time
 
 
@@ -10,7 +10,9 @@ class Graphics:
         width = video['width']
         height = video['height']
         fps = video['fps']
+        color_map = video_style['color-map']
 
+        self.cmap = plt.get_cmap(color_map)
         self.colors = colors
         self.options = video_style
         self.file = file
@@ -35,13 +37,12 @@ class Graphics:
         text_obj = self.fps_font.render(text, True, self.colors["fps"])
         self.window.blit(text_obj, (7, 7))
 
-    def draw_debug(self, data, n, t, t2):
+    def draw_debug(self, data, n, t):
         texts = \
             f"{n = }",\
             f"{t = :.2f}s of {self.T:.0f}s",\
             f"offset = {t - n / self.fps:.5f}",\
-            f"max = {max(data):.3f}",\
-            f"music offset {t2}" 
+            f"max = {max(data):.3f}"
         dy = 14
         for i, text in enumerate(texts):
             text_obj = self.fps_font.render(text, True, self.colors["debug"])
@@ -100,16 +101,15 @@ class Graphics:
 
     def draw_bar_frame(self, data):
         n = len(data)
-        c0, c1 = self.options["bars-crange"]
-        colors = [(r, g, b) for r, g, b, _ in  # (r, g, b) color range
-                  pl.cm.jet(np.linspace(c0, c1, self.height))*255]
+        colors = [np.array(self.cmap(i)[:3])*255 for i in range(255)]
         widths = np.linspace(0, self.width, n+1)
         avg_width = self.width / n
 
         for i in range(n):
             d = data[i] * self.height
+            color = colors[int(data[i] * 254)]
             body = pg.Rect(widths[i], self.height - d, avg_width, d)  # left, top, width, height
-            pg.draw.rect(self.window, colors[int(data[i]*self.height)-1], body)
+            pg.draw.rect(self.window, color, body)
 
     def draw_main(self, data):
         scenes = {
@@ -134,7 +134,6 @@ class Graphics:
 
         while True:
             # calculate timestep based on real-time
-            dt2 = pg.mixer.music.get_pos() / 1000
             dt = time() - t0
             n = int(self.fps * dt)
 
@@ -148,6 +147,6 @@ class Graphics:
             self.draw_main(data)
             self.draw_fps()
             self.clock.tick(self.fps)
-            self.draw_debug(data, n, dt, dt2)
+            self.draw_debug(data, n, dt)
             pg.display.update()
             self.pygame_events()
