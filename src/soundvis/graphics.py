@@ -6,7 +6,11 @@ from time import time
 
 
 class Graphics:
-    def __init__(self, file, data, video, video_style, colors):
+    def __init__(self, file, data, config):
+        video = config['video']
+        video_style = config['video-style']
+        colors = config['colors']
+
         width = video['width']
         height = video['height']
         fps = video['fps']

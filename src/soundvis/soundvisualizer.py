@@ -16,25 +16,17 @@ class SoundVis:
         Path to the audio file to be processed.
     fps : int
         Frames per second for the analysis.
-    processing : dict
-        A dictionary containing processing parameters:
-        - 'window': float, width of the time window (in seconds).
-        - 'scaling': float, scaling factor for suppressing dominant frequencies.
-        - 'smoothing': int, width of the smoothing kernel for convolution.
-        - 'n-smooth': int, number of smoothing iterations.
-        - 'span': tuple, range of frequencies to include (start, stop).
-        - 'time-smoothing': int, number of frames to smooth temporally.
-        - 'stop': float, duration (in seconds) to process the audio.
+    config : dict
+        A dictionary containing parameters
     """
 
-    def __init__(self, file, fps, processing):
+    def __init__(self, file, config):
         if not isinstance(file, str):
             assert ValueError(f"'file' must be of type str, not {type(file).__name__}")
-        if not isinstance(fps, int):
-            assert ValueError(f"'fps' must be of type int, not {type(fps).__name__}")
-        if not isinstance(processing, str):
+        if not isinstance(config, dict):
             assert ValueError(f"'processing' must be of type dict, not {type(processing).__name__}")
 
+        processing = config['processing']
         window_size = processing['window']
         scaling = processing['scaling']
         smoothing = processing['smoothing']
@@ -42,6 +34,7 @@ class SoundVis:
         span = processing['span-hz']
         time_smoothing = processing['time-smoothing']
         stop = processing['stop-time']
+        fps = config['video']['fps']
 
         self.f, self.fs = self._read_audio(file, stop)
         self.fps = fps
@@ -153,7 +146,7 @@ class SoundVis:
             # index of start/stop
             start, stop = self.span[0] * Ni // self.fs, self.span[1] * Ni // self.fs
             f_hats.append(fi_hat[start:stop])
-            if not (i + 1 % 25) or (i + 1 == S):
+            if not (i % 25) or (i + 1 == S):
                 progress_bar(i + 1, S)
 
         return self._normalize(f_hats)
